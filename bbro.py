@@ -1,6 +1,17 @@
 import requests
 from os import path
 import re
+import sqlite3
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+engine = create_engine('sqlite:///:memory:')
+
+Session = sessionmaker(bind=engine)
+session = Session()
+
+
 
 
 #тип добавляемого объекта. сейчас задаем руками, а потом - radiobutton
@@ -13,7 +24,14 @@ objsType = "group"
 inputObjs = open('input.txt')
 objsUrls = inputObjs.read().split("\n")
 
-# преобразуем урлы в id объектов, чтобы добавить их в базу и начать отслеживать.
+#проверка типа объектов. ошибка, если не правильный тип
+
+#проверяем и сортируем объекты, Реализуем позже. Сейчас пользователь будет сам выбирать тип объектов
+#for eachObjUrl in objsUrls:
+#    urlPartToCheck = eachObjUrl[eachObjUrl.find("vk.com/")+7:]
+    
+
+# преобразуем урлы в id объектов, чтобы добавить их в базу и начать отслеживать. Возвращает список объектов
 def getObjsList(objsUrls):
     if objsType == "group":
         regextpl = '^.+vk\.com\/club\d+$'
@@ -35,15 +53,14 @@ def getObjsList(objsUrls):
     elif objsType == "topic":
         regextpl = '^.+vk\.com\/topic-\d+.\d+$'
         for eachObjUrl in objsUrls:
-            if re.match(regextpl, eachObjUrl) is not None:
-                topicFullId = eachObjUrl[eachObjUrl.find("vk.com/")+9:]
-            else:
-                topicFullId = eachObjUrl[eachObjUrl.find("vk.com/")+7:]
+            topicFullId = eachObjUrl[eachObjUrl.find("vk.com/topic-")+13:]
             objsList.append(topicFullId)
     else pass
     
     return objsList
-            
+
+
+#сохраняем список объектов в базу
 
 
 
@@ -53,9 +70,10 @@ def getObjsList(objsUrls):
 
 
 
-#проверяем и сортируем объекты, Реализуем позже. Сейчас пользователь будет сам выбирать тип объектов
-#for eachObjUrl in objsUrls:
-#    urlPartToCheck = eachObjUrl[eachObjUrl.find("vk.com/")+7:]
+
+
+
+
     
     
     
@@ -63,8 +81,7 @@ def getObjsList(objsUrls):
     
     
     
-    
-	alluserids =[]
+#	alluserids =[]
     
     
 
@@ -87,7 +104,7 @@ def getObjsList(objsUrls):
 
 
 #def inputObjs():
-    fileWithObjs =
+#    fileWithObjs =
     
     
 #def getStartSubs()

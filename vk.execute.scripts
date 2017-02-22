@@ -1,0 +1,9 @@
+
+execute.wallpostsids
+
+var groupid = -72892095;
+var count = 99;
+return API.wall.get({
+            "owner_id": groupid,
+            "count" : count
+            }).items@.id;
