@@ -14,4 +14,4 @@ with con:
     
     
 with con:
-SELECT * FROM Orders WHERE Id=6
+SELECT * FROM Projs WHERE ProjId=6

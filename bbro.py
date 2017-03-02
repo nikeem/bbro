@@ -43,6 +43,10 @@ inputObjs = open('input.txt')
 objsUrls = inputObjs.read().split("\n")
 inputObjs.close
 
+#переменная для названия таблизы, хранящей данные проектов
+projsTable = "Projs"
+
+
 #проверка типа объектов. ошибка, если не правильный тип
 
 #проверяем и сортируем объекты, Реализуем позже. Сейчас пользователь будет сам выбирать тип объектов
@@ -83,7 +87,7 @@ def getObjsList(objsUrls):
 #сохраняем список объектов в базу
 
 
-con = sqlite3.connect('test.db')
+condb = sqlite3.connect('test.db')
 
 with con:
     
@@ -101,7 +105,12 @@ with con:
 
 
 
-
+def loadSettings(projId,condb):
+    with condb:
+        cur = con.cursor()
+        cur.execute("SELECT * FROM {} WHERE Id={}".format(projsTable, projId))
+    
+    return objS Actions olddata
 
 
 
