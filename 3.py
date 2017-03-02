@@ -42,11 +42,18 @@ def loadSettings(projsTable,projId,dbname):
         
         return cur.fetchone()
 
+#  отправляем данные в базу, обновляем колонку LastState
+def writeToDb(newState,dbname):
+    newStateString = '['+','.join(newState)+']'
+    condb = sqlite3.connect(dbname)
+    with condb:
+        cur = condb.cursor()
+        cur.execute("UPDATE {} SET LastState = '{}' WHERE ProjId={}".format(projsTable, newStateString, projId))
 
-def getAllWallActivity():
-    def getWallLikes():
-    def getWallReposts():    
-    def getWallComments():
+#def getAllWallActivity():
+    # def getWallLikes():
+    #def getWallReposts():    
+    # def getWallComments():
         
     
 def getWallLikes():
@@ -141,11 +148,15 @@ elif objsType == 2:
         newFriends = getNewFriends(Objs,LastState,Token)
         
         
-        отправляем данные 
+
+    
+        
+
+
         
         
-        добавляем пересозданный ряд в базу
-        cur.execute("INSERT INTO Projs VALUES(3,'Nik',1,1,3,1900002663,1603181057,8447268,'9db2a2fed1095f2a477f08d467eed637d32d853f66e525671cac881a1a71fcb8ad6fca4968993072face2','[72892095,45650931]','[123]')")
+#добавляем пересозданный ряд в базу
+#cur.execute("INSERT INTO Projs VALUES(3,'Nik',1,1,3,1900002663,1603181057,8447268,'9db2a2fed1095f2a477f08d467eed637d32d853f66e525671cac881a1a71fcb8ad6fca4968993072face2','[72892095,45650931]','[123]')")
         
         
         
