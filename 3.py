@@ -5,7 +5,8 @@ import re
 
 
 
-#конфиг, который нужно вынести в отдельный файл, а затем хранить в базе
+#конфиг, который нужно вынести в отдельный файл, а затем хранить в базе 
+#upd 02.03 конфиг грузится из базы
 #тип добавляемого объекта. сейчас задаем руками, а потом - radiobutton
 #objsType = "group"
 #group 1, user 2, topic 3
@@ -16,14 +17,13 @@ import re
 #unSubs 3
 #newFollowers 4
 
-#настройка ретаргета ads.importTargetContacts
-
 #account_id=1900002663
 #client_id=1603181057
 #target_group_id=8447268
 #whereTo = [account_id,client_id,target_group_id,contacts]
 
-projsTable = "Projs"
+projsTable = 'Projs'
+dbname = 'test.db'
 
 #получаем данные из базы
 def loadSettings(projsTable,projId,dbname):
@@ -49,6 +49,17 @@ def writeToDb(newState,dbname):
     with condb:
         cur = condb.cursor()
         cur.execute("UPDATE {} SET LastState = '{}' WHERE ProjId={}".format(projsTable, newStateString, projId))
+        
+#отправляем данные в ретаргет
+def retargetGroupUpdate(adAccId,adClientId,targetGroupId,Token,userIds):
+    #пока работает в один заход - до 1000 контактов разово. нужно переписать так, чтобы эту функцию можно было использовать и для добавления всего спика первоначально при созании проекта, и при добавлении отдельных контактов.
+    userIdsString = ','.join(userIds)
+    fullreq = 'https://api.vk.com/method/ads.importTargetContacts?account_id='+str(adAccId)+'&client_id='+str(adClientId)+'&contacts='+userIdsString+'&access_token='+Token+'&v=5.62'
+    r = requests.post(fullreq)
+    resultt = r.text
+    #print('{} users added!'.format(resultt))
+    return resultt
+    
 
 #def getAllWallActivity():
     # def getWallLikes():
@@ -74,7 +85,7 @@ def getUnSubs():
 def getNewFriends(Objs,LastState,access_token):
     allFriendsList = []
     for userid in Objs:
-        execute.friendsget2
+        
         fullreq = 'https://api.vk.com/method/execute.friendsget2?usrid='+str(userid)+'&access_token='+access_token+'&v=5.62'
         r = requests.post(fullreq)
         resultt = r.text
@@ -83,7 +94,7 @@ def getNewFriends(Objs,LastState,access_token):
         allFriendsList = allFriendsList+resultt.split(",")
 	    
     newFriends = list(set(allFriendsList) - set(LastState))
-    return newFriends
+    return newFriends, set(allFriendsList)
 
 
 
@@ -93,8 +104,8 @@ def getBoardTopicComms():
         
 #основной цикл   
 
-# получаем настройки проекта
-(ProjId,ProjName,ProjOwner,objsType,whatLookAt,adAccId,adClientId,targetGroupId,Token,Objs,LastState) = loadSettings(projsTable,1,'test.db')
+# получаем настройки проекта. ЗДЕСЬ ХАРДКОД ID ПРОЕКТА. ПЕРЕДАВАТЬ ПЕРЕВЕННОЙ!
+(ProjId,ProjName,ProjOwner,objsType,whatLookAt,adAccId,adClientId,targetGroupId,Token,Objs,LastState) = loadSettings(projsTable,1,dbname)
 #print(ProjId,ProjName,ProjOwner,objsType,whatLookAt,adAccId,adClientId,targetGroupId,Token,Objs,LastState)
 
 #раскладываем строку объектов с список объектов
@@ -145,39 +156,20 @@ elif objsType == 2:
         
     elif whatLookAt == 4
         print('new friends')
-        newFriends = getNewFriends(Objs,LastState,Token)
-        
+        newUsersToAdd, newState = getNewFriends(Objs,LastState,Token)
         
 
     
-        
 
-
-        
-        
-#добавляем пересозданный ряд в базу
-#cur.execute("INSERT INTO Projs VALUES(3,'Nik',1,1,3,1900002663,1603181057,8447268,'9db2a2fed1095f2a477f08d467eed637d32d853f66e525671cac881a1a71fcb8ad6fca4968993072face2','[72892095,45650931]','[123]')")
-        
-        
-        
-        
-        
-        
-        
+    
     
     
 elif objsType == 3:
     print('topic')
     if whatLookAt == 5:
         print('boardComments')
+        
+        
 
-
-
-
-#отправляем данные в ретаргетинг
-#def updateRetarget()
-
-
-
-#обновляем row в базе sqllite
-#def updateDb()
+retargetGroupUpdate(adAccId,adClientId,targetGroupId,Token,newUsersToAdd)
+writeToDb(newState,dbname)
