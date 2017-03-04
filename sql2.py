@@ -5,7 +5,7 @@ con = sqlite3.connect('test.db')
 
 with con:
     cur = con.cursor()
-    cur.execute("SELECT * FROM Projs WHERE ProjId=1")
+    cur.execute("SELECT * FROM Projs WHERE ProjId=7")
     
     #получили строку в форме tuple
     #print(cur.fetchone()[1])

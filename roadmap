@@ -25,3 +25,18 @@
 
 Добавление:
 Поля
+
+
+
+
+https://oauth.vk.com/authorize?client_id=5583390&redirect_uri=https://vk.com/&scope=134593951&response_type=code&v=5.62
+
+
+
+89327fb75c313e8735
+
+
+https://oauth.vk.com/access_token?client_id=5583390&redirect_uri=https://vk.com/&client_secret=jjTexWar9UOqRZzTk1jq&code=89327fb75c313e8735
+
+
+9a03bc09de702b1bc8df9d00a576bc62cb4e6525ac62be696b779e3c00b93190a0d68859ca695edc89499

@@ -1,3 +1,83 @@
+var citylist = Args.citylist.split(",");
+var users = [];
+var users2 = [];
+
+while (citylist.length > 0)
+   {
+       var one_cityid = citylist.shift();
+       users = users + API.users.search({"count" : "1000", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "1", "city" : one_cityid}).items@.id;
+    users2 = users + API.users.search({"count" : "1000", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "2", "city" : one_cityid}).items@.id;
+   }
+return users2;
+
+
+
+
+
+
+
+
+var userIdsList = Args.usrids.split(",");
+var FriendsList = [];
+
+
+while (userIdsList.lenght > 0) {
+    var oneUserId = userIdsList.shift;
+}
+
+if (FriendsInfo.count > 1000) {
+    while ((offset < FriendsInfo.count) && (offset < offsetmax)) {
+        FriendsList = FriendsList + API.friends.get({
+            "user_id": Args.usrid,
+            "offset": offset
+        }).items;
+        offset = offset + 1000;
+    }
+} else {
+    FriendsList = API.friends.get({
+            "user_id": Args.usrid,
+            }).items;
+}
+
+return FriendsList;
+    
+    
+    
+    
+    
+    
+    
+    
+    
+var offset = parseInt(Args.offs);
+var offsetmax = offset + 23001;
+var MembersInfo = API.groups.getMembers({
+    "group_id": Args.grid
+});
+var MembersList = [];
+
+if (MembersInfo.count > 1000) {
+    while ((offset < MembersInfo.count) && (offset < offsetmax)) {
+        MembersList = MembersList + API.groups.getMembers({
+            "group_id": Args.grid,
+            "offset": offset
+        }).items;
+        offset = offset + 1000;
+    }
+} else {
+    MembersList = API.groups.getMembers({
+        "group_id": Args.grid
+    }).items;
+}
+return MembersList;
+
+
+
+
+
+
+
+
 
 execute.wallpostsids
 
@@ -9,3 +89,45 @@ return API.wall.get({
             "owner_id": groupid,
             "count" : count
             }).items@.id;
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+findusersbybirthday
+var iterations = Args.iters;
+var users=[];
+users = users + API.users.search({"count" : "999", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "1", "city" : "1"}).items@.id;
+users = users + API.users.search({"count" : "999", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "2", "city" : "1"}).items@.id;
+users = users + API.users.search({"count" : "999", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "1", "city" : "2"}).items@.id;
+users = users + API.users.search({"count" : "999", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "2", "city" : "2"}).items@.id;
+users = users + API.users.search({"count" : "999", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "1", "city" : "10"}).items@.id;
+users = users + API.users.search({"count" : "999", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "2", "city" : "10"}).items@.id;
+users = users + API.users.search({"count" : "999", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "1", "city" : "37"}).items@.id;
+users = users + API.users.search({"count" : "999", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "2", "city" : "37"}).items@.id;
+users = users + API.users.search({"count" : "999", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "1", "city" : "159"}).items@.id;
+users = users + API.users.search({"count" : "999", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "2", "city" : "159"}).items@.id;
+users = users + API.users.search({"count" : "999", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "1", "city" : "49"}).items@.id;
+users = users + API.users.search({"count" : "999", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "2", "city" : "49"}).items@.id;
+users = users + API.users.search({"count" : "999", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "1", "city" : "60"}).items@.id;
+users = users + API.users.search({"count" : "999", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "2", "city" : "60"}).items@.id;
+users = users + API.users.search({"count" : "999", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "1", "city" : "61"}).items@.id;
+users = users + API.users.search({"count" : "999", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "2", "city" : "61"}).items@.id;
+users = users + API.users.search({"count" : "999", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "1", "city" : "72"}).items@.id;
+users = users + API.users.search({"count" : "999", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "2", "city" : "72"}).items@.id;
+users = users + API.users.search({"count" : "999", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "1", "city" : "73"}).items@.id;
+users = users + API.users.search({"count" : "999", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "2", "city" : "73"}).items@.id;
+users = users + API.users.search({"count" : "999", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "1", "city" : "95"}).items@.id;
+users = users + API.users.search({"count" : "999", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "2", "city" : "159"}).items@.id;
+users = users + API.users.search({"count" : "999", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "1", "city" : "49"}).items@.id;
+users = users + API.users.search({"count" : "999", "birth_day" : Args.bday, "birth_month" : Args.bmonth, "birth_year" : Args.byear, "sex" : "2", "city" : "49"}).items@.id;
+iterations = iterations + 1;
+
+return users; 

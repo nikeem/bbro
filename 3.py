@@ -2,6 +2,7 @@ import sys
 import sqlite3
 import requests
 import re
+import time
 
 
 
@@ -43,7 +44,7 @@ def loadSettings(projsTable,projId,dbname):
         return cur.fetchone()
 
 #  отправляем данные в базу, обновляем колонку LastState
-def writeToDb(newState,dbname):
+def writeToDb(newState,dbname,projId):
     newStateString = '['+','.join(newState)+']'
     condb = sqlite3.connect(dbname)
     with condb:
@@ -54,10 +55,22 @@ def writeToDb(newState,dbname):
 def retargetGroupUpdate(adAccId,adClientId,targetGroupId,Token,userIds):
     #пока работает в один заход - до 1000 контактов разово. нужно переписать так, чтобы эту функцию можно было использовать и для добавления всего спика первоначально при созании проекта, и при добавлении отдельных контактов.
     userIdsString = ','.join(userIds)
-    fullreq = 'https://api.vk.com/method/ads.importTargetContacts?account_id='+str(adAccId)+'&client_id='+str(adClientId)+'&contacts='+userIdsString+'&access_token='+Token+'&v=5.62'
-    r = requests.post(fullreq)
+    
+    #print("userIdsString: ", userIdsString)
+    #newfilename = time.strftime('%y%m%d%H%M%S', time.localtime()) + 'ids.txt'
+    #thefile = open(newfilename, 'w')
+
+    #for item in userIds:
+    #    thefile.write("%s\n" % item)
+    #    thefile.close
+    print('Записали пользователей в файл')
+    
+    r = requests.post('https://api.vk.com/method/ads.importTargetContacts', data = {'account_id':str(adAccId), 'client_id':str(adClientId), 'contacts': userIdsString, 'access_token':Token,'v': '5.62', 'target_group_id': targetGroupId })
+    
+    #fullreq = 'https://api.vk.com/method/ads.importTargetContacts?account_id='+str(adAccId)+'&client_id='+str(adClientId)+'&contacts='+userIdsString+'&access_token='+Token+'&v=5.62'
+    #r = requests.post(fullreq)
     resultt = r.text
-    #print('{} users added!'.format(resultt))
+    print('{} users added!'.format(resultt))
     return resultt
     
 
@@ -67,55 +80,77 @@ def retargetGroupUpdate(adAccId,adClientId,targetGroupId,Token,userIds):
     # def getWallComments():
         
     
-def getWallLikes():
+#def getWallLikes():
     
     
-def getWallReposts():
+#def getWallReposts():
     
     
-def getWallComments():
+#def getWallComments():
     
     
-def getNewSubs():
+#def getNewSubs():
     
     
-def getUnSubs():
+#def getUnSubs():
     
 #функция получает список друзей всех пользователй в списке Objs, вычитает прошлый список LastState и возвращает id свежедобавленныъ друзей.   
 def getNewFriends(Objs,LastState,access_token):
     allFriendsList = []
     for userid in Objs:
-        
-        fullreq = 'https://api.vk.com/method/execute.friendsget2?usrid='+str(userid)+'&access_token='+access_token+'&v=5.62'
+        print("Парсим друзей пользоватля: ", userid)
+        fullreq = 'https://api.vk.com/method/execute.friendsgett?usrid='+str(userid)+'&access_token='+access_token+'&v=5.62'
         r = requests.post(fullreq)
         resultt = r.text
         beginwith = r.text.index("[")
         resultt = r.text[beginwith+1:-2]
+        #print(resultt.split(","))
         allFriendsList = allFriendsList+resultt.split(",")
+        time.sleep(0.19)
+	    
+    newFriends = list(set(allFriendsList) - set(LastState))
+    return newFriends, set(allFriendsList)
+
+
+def getNewFriends(Objs,LastState,access_token):
+    allFriendsList = []
+    for userid in Objs:
+        print("Парсим друзей пользоватля: ", userid)
+        fullreq = 'https://api.vk.com/method/execute.friendsgett?usrid='+str(userid)+'&access_token='+access_token+'&v=5.62'
+        r = requests.post(fullreq)
+        resultt = r.text
+        beginwith = r.text.index("[")
+        resultt = r.text[beginwith+1:-2]
+        #print(resultt.split(","))
+        allFriendsList = allFriendsList+resultt.split(",")
+        time.sleep(0.19)
 	    
     newFriends = list(set(allFriendsList) - set(LastState))
     return newFriends, set(allFriendsList)
 
 
 
+
     
-def getBoardTopicComms():
+#def getBoardTopicComms():
         
         
 #основной цикл   
 
 # получаем настройки проекта. ЗДЕСЬ ХАРДКОД ID ПРОЕКТА. ПЕРЕДАВАТЬ ПЕРЕВЕННОЙ!
-(ProjId,ProjName,ProjOwner,objsType,whatLookAt,adAccId,adClientId,targetGroupId,Token,Objs,LastState) = loadSettings(projsTable,1,dbname)
+(ProjId,ProjName,ProjOwner,objsType,whatLookAt,adAccId,adClientId,targetGroupId,Token,Objs,LastState) = loadSettings(projsTable,7,dbname)
 #print(ProjId,ProjName,ProjOwner,objsType,whatLookAt,adAccId,adClientId,targetGroupId,Token,Objs,LastState)
 
 #раскладываем строку объектов с список объектов
 Objs = Objs[1:-1].split(',')
-#print(Objs[0])
+print(Objs)
 
 #раскладываем строку найденных объектов в список объектов
+print("LastState до разделения в список ", LastState)
 LastState = LastState[1:-1].split(',')
-#print(LastState[0])
+print(LastState)
 
+print("Загрузили настройки проекта\n")
 
 #в зависимости от типа объекта и типа отслеживания, вызываем функцию, а уже внутри нее вызывем функцию в зависимости от объекта отслеживания
 
@@ -124,38 +159,38 @@ if objsType == 1:
     if whatLookAt == 1:
         print('all wall activity')
         
-    elif whatLookAt == 11
+    elif whatLookAt == 11:
         print('likes wall activity')
         
-    elif whatLookAt == 12
+    elif whatLookAt == 12:
         print('likes wall activity')
         
-    elif whatLookAt == 13
+    elif whatLookAt == 13:
         print('likes wall activity')
         
-    elif whatLookAt == 2
+    elif whatLookAt == 2:
         print('new subs')
         
-    elif whatLookAt == 3
+    elif whatLookAt == 3:
         print('unsubs')
         
     
 elif objsType == 2:
-    print('user')
+    print('Следим за пользователями ')
     if whatLookAt == 1:
         print('all wall activity')
         
-    elif whatLookAt == 11
+    elif whatLookAt == 11:
         print('likes wall activity')
         
-    elif whatLookAt == 12
+    elif whatLookAt == 12:
         print('likes wall activity')
         
-    elif whatLookAt == 13
+    elif whatLookAt == 13:
         print('likes wall activity')
         
-    elif whatLookAt == 4
-        print('new friends')
+    elif whatLookAt == 4:
+        print('Получсем новых друзей пользователей ')
         newUsersToAdd, newState = getNewFriends(Objs,LastState,Token)
         
 
@@ -172,4 +207,4 @@ elif objsType == 3:
         
 
 retargetGroupUpdate(adAccId,adClientId,targetGroupId,Token,newUsersToAdd)
-writeToDb(newState,dbname)
+writeToDb(newState,dbname,ProjId)
