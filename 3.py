@@ -1,8 +1,9 @@
 import sys
 import sqlite3
 import requests
-import re
+#import re
 import time
+import json
 
 
 
@@ -60,9 +61,9 @@ def retargetGroupUpdate(adAccId,adClientId,targetGroupId,Token,userIds):
     #newfilename = time.strftime('%y%m%d%H%M%S', time.localtime()) + 'ids.txt'
     #thefile = open(newfilename, 'w')
 
-    #for item in userIds:
-    #    thefile.write("%s\n" % item)
-    #    thefile.close
+    for item in userIds:
+        thefile.write("%s\n" % item)
+        thefile.close
     print('Записали пользователей в файл')
     
     r = requests.post('https://api.vk.com/method/ads.importTargetContacts', data = {'account_id':str(adAccId), 'client_id':str(adClientId), 'contacts': userIdsString, 'access_token':Token,'v': '5.62', 'target_group_id': targetGroupId })
@@ -95,35 +96,65 @@ def retargetGroupUpdate(adAccId,adClientId,targetGroupId,Token,userIds):
 #def getUnSubs():
     
 #функция получает список друзей всех пользователй в списке Objs, вычитает прошлый список LastState и возвращает id свежедобавленныъ друзей.   
-def getNewFriends(Objs,LastState,access_token):
-    allFriendsList = []
-    for userid in Objs:
-        print("Парсим друзей пользоватля: ", userid)
-        fullreq = 'https://api.vk.com/method/execute.friendsgett?usrid='+str(userid)+'&access_token='+access_token+'&v=5.62'
-        r = requests.post(fullreq)
-        resultt = r.text
-        beginwith = r.text.index("[")
-        resultt = r.text[beginwith+1:-2]
-        #print(resultt.split(","))
-        allFriendsList = allFriendsList+resultt.split(",")
-        time.sleep(0.19)
-	    
-    newFriends = list(set(allFriendsList) - set(LastState))
-    return newFriends, set(allFriendsList)
+#def getNewFriends(Objs,LastState,access_token):
+#    allFriendsList = []
+#    
+#    
+#    
+#    for userid in Objs:
+#        print("Парсим друзей пользоватля: ", userid)
+#        fullreq = 'https://api.vk.com/method/execute.friendsgett?usrid='+str(userid)+'&access_token='+access_token+'&v=5.62'
+#        
+#        json.loads
+#        r = requests.post(fullreq)
+#        resultt = r.text
+#        beginwith = r.text.index("[")
+#        resultt = r.text[beginwith+1:-2]
+#        #print(resultt.split(","))
+#        allFriendsList = allFriendsList+resultt.split(",")
+#        time.sleep(0.19)
+#	    
+#    newFriends = list(set(allFriendsList) - set(LastState))
+#    return newFriends, set(allFriendsList)
 
 
 def getNewFriends(Objs,LastState,access_token):
     allFriendsList = []
-    for userid in Objs:
-        print("Парсим друзей пользоватля: ", userid)
-        fullreq = 'https://api.vk.com/method/execute.friendsgett?usrid='+str(userid)+'&access_token='+access_token+'&v=5.62'
-        r = requests.post(fullreq)
+    
+    
+    while len(Objs) > 0:
+        if len(Objs) > 25:
+            userIds25Max = ','.join(Objs[0:25])
+            del Objs[0:25]
+		
+        else:
+            userIds25Max = ','.join(Objs)
+            del Objs [:]
+            
+        print("Парсим друзей пользоватлей: ", userIds25Max)
+        
+        r = requests.post('https://api.vk.com/method/execute.friendsget', data = {'usrids':userIds25Max, 'access_token':Token,'v': '5.62'})
+        
         resultt = r.text
+        print(r.text)
         beginwith = r.text.index("[")
         resultt = r.text[beginwith+1:-2]
         #print(resultt.split(","))
         allFriendsList = allFriendsList+resultt.split(",")
-        time.sleep(0.19)
+        time.sleep(3)
+    
+    
+    
+    #for userid in Objs:
+    #    print("Парсим друзей пользоватля: ", userid)
+    #    fullreq = 'https://api.vk.com/method/execute.friendsget?usrids='+str(userid)+'&access_token='+access_token+'&v=5.62'
+    #    r = requests.post(fullreq)
+    #    resultt = r.text
+    #    beginwith = r.text.index("[")
+    #    resultt = r.text[beginwith+1:-2]
+    #    #print(resultt.split(","))
+    #    allFriendsList = allFriendsList+resultt.split(",")
+    #    time.sleep(0.19)
 	    
     newFriends = list(set(allFriendsList) - set(LastState))
     return newFriends, set(allFriendsList)
@@ -143,12 +174,12 @@ def getNewFriends(Objs,LastState,access_token):
 
 #раскладываем строку объектов с список объектов
 Objs = Objs[1:-1].split(',')
-print(Objs)
+#print(Objs)
 
 #раскладываем строку найденных объектов в список объектов
-print("LastState до разделения в список ", LastState)
+#print("LastState до разделения в список ", LastState)
 LastState = LastState[1:-1].split(',')
-print(LastState)
+#print(LastState)
 
 print("Загрузили настройки проекта\n")
 
