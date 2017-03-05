@@ -47,6 +47,7 @@ def loadSettings(projsTable,projId,dbname):
 #  отправляем данные в базу, обновляем колонку LastState
 def writeToDb(newState,dbname,projId):
     newStateString = '['+','.join(newState)+']'
+    #newStateString = ','.join(str(oneId) for oneId in newState)
     condb = sqlite3.connect(dbname)
     with condb:
         cur = condb.cursor()
@@ -122,7 +123,6 @@ def retargetGroupUpdate(adAccId,adClientId,targetGroupId,Token,userIds):
 def getNewFriends(Objs,LastState,access_token):
     allFriendsList = []
     
-    
     while len(Objs) > 0:
         if len(Objs) > 25:
             userIds25Max = ','.join(Objs[0:25])
@@ -136,22 +136,20 @@ def getNewFriends(Objs,LastState,access_token):
         
         r = requests.post('https://api.vk.com/method/execute.friendsget', data = {'usrids':userIds25Max, 'access_token':Token,'v': '5.62'})
         
-        #отделяем чистую выдачу от выдачи с ошибкой для дальнейшей правильно обработки
-        if 'execute_errors' in r.text:
-            resultt = r.text
-            beginwith = r.text.index("response")
-            endwith = r.text.index("execute_errors", beginwith+13)
-            print(resultt)
-            resultt = r.text[beginwith+13:endwith-4]
-            #print(resultt.split(","))
-            allFriendsList = allFriendsList+resultt.split(",")
+        resultt = r.json()['response']
+                
+        if isinstance(resultt, str):
+            print("Получили данные от АПИ в формате строки")
+            allFriendsList = allFriendsList + resultt.split(",")
+                        
+        elif isinstance(resultt, list):
+                        
+            print("Получили данные от АПИ в формате массива")
+            resultt = ','.join(str(oneId) for oneId in resultt)
+            #print("конвертим в стринг")
+            #print(resultt)
             
-        else:
-            resultt = json.loads(r.text)['response']['items']
-            #if isinstance(resultt, str):
-                #allFriendsList = allFriendsList + resultt.split(",")
-            #elif isinstance(resultt, list):
-            allFriendsList = allFriendsList + resultt
+            allFriendsList = allFriendsList + resultt.split(",")
             #else:
                 #sys.exit("Ошибка на стадии парсинга пользователей.")
         
@@ -163,7 +161,7 @@ def getNewFriends(Objs,LastState,access_token):
         #resultt = r.text[beginwith+1:-2]
         #print(resultt.split(","))
         
-        time.sleep(0.19)
+        time.sleep(0.1)
     
     
     
@@ -188,9 +186,9 @@ def getNewFriends(Objs,LastState,access_token):
     newFriends = list(set(allFriendsList) - set(LastState))
     print(len(newFriends))
     
-    print(allFriendsList[1:4])
-    print(LastState[1:4])
-    print(newFriends[1:4])
+    print(allFriendsList[1:9])
+    print(LastState[1:9])
+    print(newFriends[1:9])
     
     
     
