@@ -1,0 +1,163 @@
+import requests
+import time
+from os import path
+
+#открываем айдишники, делаем список айдишников
+#inputfile = open('ids3.txt')
+#groupidslist = inputfile.read().split("\n")
+
+#функция преобразования списка ссылок в список id. нужен методе execute,чтобы парсить сразу по 25.
+
+# функция преобразования урлов в лист screen_name-ов
+def get_screen_names_from_urls(groupurls):
+	screen_names_list = []
+	for fullurl in groupurls:
+			rrr = fullurl[fullurl.find("vk.com/")+7:]
+			screen_names_list.append(rrr)
+	return screen_names_list
+
+	
+# задаем список 25 screenname, возвращает список id
+def screen_name_resolve(screen_name_list_string25):
+	fullreq = 'https://api.vk.com/method/execute.screen_name_resolve?screen_name_list='+screen_name_list_string25+'&access_token=9db2a2fed1095f2a477f08d467eed637d32d853f66e525671cac881a1a71fcb8ad6fca4968993072face2&v=5.53'
+	apiresponse = requests.post(fullreq)
+	beginwith = apiresponse.text.index("[")
+	return apiresponse.text[beginwith+1:-2].split(",")
+
+#берем 25 screen_name-ов
+#преобразуем список screenname в строку через запятую
+#groupurlsstring = ','.join(groupurls)	
+#делаем запрос к нашему методу ВК, получаем 25 id
+#resultt = screen_name_resolve(groupurlsstring)
+#allids = allids + screen_name_resolve(groupurlsstring)
+
+
+
+
+#основная функция получения списка id из иписка урлов
+def get_group_ids_list(groupurls):
+	allgroupids = []
+	screen_names_list = get_screen_names_from_urls(groupurls)
+	while len(screen_names_list) > 0:
+		if len(screen_names_list) > 25:
+			groupurlsstring = ','.join(screen_names_list[0:25])
+			del screen_names_list[0:25]
+		
+		else:
+			groupurlsstring = ','.join(screen_names_list)
+			del screen_names_list [:]
+				
+		allgroupids = allgroupids + screen_name_resolve(groupurlsstring)
+		time.sleep(.19)	
+	
+	return allgroupids
+
+
+
+
+
+
+#функция получаения от апи списка айди пользователей
+def getidsfromapi(groupid,offsettouse):
+	
+	fullreq = 'https://api.vk.com/method/execute.getallmem?grid='+str(groupid)+'&offs='+str(offsettouse)+'&access_token=9db2a2fed1095f2a477f08d467eed637d32d853f66e525671cac881a1a71fcb8ad6fca4968993072face2&v=5.53'
+	r = requests.post(fullreq)
+	resultt = r.text
+	beginwith = r.text.index("[")
+	resultt = r.text[beginwith+1:-2]
+	list1 = resultt.split(",")
+	return list1
+
+def getmemcount(groupid):
+	fullreq = 'https://api.vk.com/method/execute.memcount?grid='+str(eachid)+'&access_token=9db2a2fed1095f2a477f08d467eed637d32d853f66e525671cac881a1a71fcb8ad6fca4968993072face2&v=5.53'
+	r = requests.post(fullreq)
+	resultt = r.text
+	beginwith = r.text.index(":")
+	resultt = r.text[beginwith+1:-1]
+	time.sleep(.19)
+	try:
+	    resultt = int(resultt)
+	except ValueError:
+		resultt = 0
+	return int(resultt)
+
+
+
+
+
+
+
+
+ 
+class Profiler(object):
+    def __enter__(self):
+        self._startTime = time.time()
+         
+    def __exit__(self, type, value, traceback):
+        print ("Elapsed time: {:.3f} sec".format(time.time() - self._startTime))
+
+
+
+
+with Profiler() as p:
+	inputfile = open('ids3.txt')
+	groupurls = inputfile.read().split("\n")
+	alluserids =[]
+	groupidslist = get_group_ids_list(groupurls)
+
+	for members_value in groupidslist:
+		if members_value=='null': groupidslist.remove(members_value)
+
+	print("Собрали", len(groupidslist), "живых групп")
+
+	#выводим id групп, которые будем парсить.
+	#print(groupidslist)
+
+	for eachid in groupidslist:
+		offset = 0
+		print("Парсим", eachid)
+		memcount = getmemcount(eachid)
+		
+			# есть какая-то проблема с парсингам больших групп. надо найти ошибку. что-то не так с оффсетами
+	
+		if memcount == 0:
+			pass
+		elif memcount <= 24000:
+			qwe = getidsfromapi(eachid,offset)
+			alluserids = alluserids + qwe
+		
+	
+		else:
+			while offset < memcount:
+				qwe = getidsfromapi(eachid,offset)
+				alluserids = alluserids + qwe
+				offset = offset + 24000
+				time.sleep(.19)
+		time.sleep(.19)
+        
+        
+	
+
+#фильтруем список id
+	mingr = 4
+	maxgr = 25
+
+#allids = map(int, allids)
+	allidsdics = {}
+	for i in alluserids:
+		if i in allidsdics:
+			allidsdics[i] += 1
+		else:
+			allidsdics[i] = 1 
+		
+	allkeys = allidsdics.keys()
+	resultkeys = []
+	for xx in allkeys:
+		if mingr <= allidsdics[xx] <= maxgr:
+			resultkeys.append(xx)
+		
+	newfilename = time.strftime('%y%m%d%H%M%S', time.localtime()) + '.txt'
+	thefile = open(newfilename, 'w')
+	for item in resultkeys:
+		thefile.write("%s\n" % item)
+	thefile.close
