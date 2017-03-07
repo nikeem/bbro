@@ -91,34 +91,44 @@ def retargetGroupUpdate(adAccId,adClientId,targetGroupId,Token,userIds):
     
 #def getWallComments():
     
-    
-#def getNewSubs():
-    
-    
-#def getUnSubs():
-    
-#функция получает список друзей всех пользователй в списке Objs, вычитает прошлый список LastState и возвращает id свежедобавленныъ друзей.   
-#def getNewFriends(Objs,LastState,access_token):
-#    allFriendsList = []
-#    
-#    
-#    
-#    for userid in Objs:
-#        print("Парсим друзей пользоватля: ", userid)
-#        fullreq = 'https://api.vk.com/method/execute.friendsgett?usrid='+str(userid)+'&access_token='+access_token+'&v=5.62'
-#        
-#        json.loads
-#        r = requests.post(fullreq)
-#        resultt = r.text
-#        beginwith = r.text.index("[")
-#        resultt = r.text[beginwith+1:-2]
-#        #print(resultt.split(","))
-#        allFriendsList = allFriendsList+resultt.split(",")
-#        time.sleep(0.19)
-#	    
-#    newFriends = list(set(allFriendsList) - set(LastState))
-#    return newFriends, set(allFriendsList)
 
+
+def getNewSubs(Objs,LastState,access_token):
+    alluserids = []
+    for eachid in Objs:
+        offset = 0
+        print("Парсим группу", eachid)
+        #получаем число членов
+        memcount = requests.post('https://api.vk.com/method/execute.memcount', data = {'grid':eachid, 'access_token':access_token,'v': '5.62'}).json()['response']
+        	
+        if memcount == 0:
+            pass
+        elif memcount <= 24000:
+            qwe = requests.post('https://api.vk.com/method/execute.getallmem', data = {'grid':eachid, 'offs':offset, 'access_token':access_token,'v': '5.62'}).json()['response']
+            alluserids = alluserids + qwe
+		
+	
+        else:
+            while offset < memcount:
+                qwe = requests.post('https://api.vk.com/method/execute.getallmem', data = {'grid':eachid, 'offs':offset, 'access_token':access_token,'v': '5.62'}).json()['response']
+                alluserids = alluserids + qwe
+                offset = offset + 24000
+                time.sleep(.19)
+        time.sleep(.33)
+        
+    alluserids = ','.join(str(oneId) for oneId in alluserids)    
+    allUsersList = alluserids.split(",")
+    
+    newSubs = list(set(allUsersList) - set(LastState))
+    print(newSubs)
+    return newSubs, set(allUsersList)
+    
+    
+    
+    
+    
+def getUnSubs():
+    
 
 def getNewFriends(Objs,LastState,access_token):
     allFriendsList = []
@@ -126,85 +136,46 @@ def getNewFriends(Objs,LastState,access_token):
     while len(Objs) > 0:
         if len(Objs) > 25:
             userIds25Max = ','.join(Objs[0:25])
-            del Objs[0:25]
-		
+            del Objs[0:25]		
         else:
             userIds25Max = ','.join(Objs)
             del Objs [:]
             
         print("Парсим друзей пользоватлей: ", userIds25Max)
-        
-        r = requests.post('https://api.vk.com/method/execute.friendsget', data = {'usrids':userIds25Max, 'access_token':Token,'v': '5.62'})
-        
+        r = requests.post('https://api.vk.com/method/execute.friendsget', data = {'usrids':userIds25Max, 'access_token':access_token,'v': '5.62'})
         resultt = r.json()['response']
                 
         if isinstance(resultt, str):
             print("Получили данные от АПИ в формате строки")
             allFriendsList = allFriendsList + resultt.split(",")
                         
-        elif isinstance(resultt, list):
-                        
+        elif isinstance(resultt, list):                        
             print("Получили данные от АПИ в формате массива")
             resultt = ','.join(str(oneId) for oneId in resultt)
             #print("конвертим в стринг")
-            #print(resultt)
-            
-            allFriendsList = allFriendsList + resultt.split(",")
-            #else:
-                #sys.exit("Ошибка на стадии парсинга пользователей.")
-        
-        
-        #print(resultt)
-        #resultt = r.text
-        #print(r.text)
-        #beginwith = r.text.index("[")
-        #resultt = r.text[beginwith+1:-2]
-        #print(resultt.split(","))
-        
+            #print(resultt)            
+            allFriendsList = allFriendsList + resultt.split(",")         
         time.sleep(0.1)
     
-    
-    
-    #for userid in Objs:
-    #    print("Парсим друзей пользоватля: ", userid)
-    #    fullreq = 'https://api.vk.com/method/execute.friendsget?usrids='+str(userid)+'&access_token='+access_token+'&v=5.62'
-    #    r = requests.post(fullreq)
-    #    resultt = r.text
-    #    beginwith = r.text.index("[")
-    #    resultt = r.text[beginwith+1:-2]
-    #    #print(resultt.split(","))
-    #    allFriendsList = allFriendsList+resultt.split(",")
-    #    time.sleep(0.19)
-    
-        
-    #for oneId in allFriendsList:
-    #    oneId = str(oneId)
-    #print(allFriendsList)
-    print(len(set(allFriendsList)))
-    print(len(set(LastState)))
+    #print(len(set(allFriendsList)))
+    #print(len(set(LastState)))
     
     newFriends = list(set(allFriendsList) - set(LastState))
-    print(len(newFriends))
-    
-    print(allFriendsList[1:9])
-    print(LastState[1:9])
-    print(newFriends[1:9])
-    
-    
+    #print(len(newFriends))
+        #print(allFriendsList[1:9])
+    #print(LastState[1:9])
+    #print(newFriends[1:9])  
     
     return newFriends, set(allFriendsList)
 
 
-
-
-    
 #def getBoardTopicComms():
         
         
 #основной цикл   
 
 # получаем настройки проекта. ЗДЕСЬ ХАРДКОД ID ПРОЕКТА. ПЕРЕДАВАТЬ ПЕРЕВЕННОЙ!
-(ProjId,ProjName,ProjOwner,objsType,whatLookAt,adAccId,adClientId,targetGroupId,Token,Objs,LastState) = loadSettings(projsTable,7,dbname)
+(ProjId,ProjName,ProjOwner,objsType,whatLookAt,adAccId,adClientId,targetGroupId,Token,Objs,LastState) = loadSettings(projsTable,8,dbname)
 #print(ProjId,ProjName,ProjOwner,objsType,whatLookAt,adAccId,adClientId,targetGroupId,Token,Objs,LastState)
 
 #раскладываем строку объектов с список объектов
@@ -236,10 +207,10 @@ if objsType == 1:
         
     elif whatLookAt == 2:
         print('new subs')
+        newUsersToAdd, newState = getNewSubs(Objs,LastState,Token)
         
     elif whatLookAt == 3:
-        print('unsubs')
-        
+        print('unsubs')        
     
 elif objsType == 2:
     print('Следим за пользователями ')
@@ -255,15 +226,10 @@ elif objsType == 2:
     elif whatLookAt == 13:
         print('likes wall activity')
         
+#готово!        
     elif whatLookAt == 4:
-        print('Получсем новых друзей пользователей ')
+        print('Получаем новых друзей пользователей ')
         newUsersToAdd, newState = getNewFriends(Objs,LastState,Token)
-        
-
-    
-
-    
-    
     
 elif objsType == 3:
     print('topic')
@@ -271,6 +237,9 @@ elif objsType == 3:
         print('boardComments')
         
         
-
-retargetGroupUpdate(adAccId,adClientId,targetGroupId,Token,newUsersToAdd)
-writeToDb(newState,dbname,ProjId)
+if len(newUsersToAdd) == 0:
+    print("Ничего не добавили!")
+else:
+    retargetGroupUpdate(adAccId,adClientId,targetGroupId,Token,newUsersToAdd)
+    writeToDb(newState,dbname,ProjId)
+    
