@@ -27,6 +27,16 @@ import json
 projsTable = 'Projs'
 dbname = 'test.db'
 
+
+
+"""
+Запись данных в базу.
+1. Если джанго работает через свою ORM, мошу ли я в этом скрипте испортировать класс и использовать базу через ORM?
+2. Принимаем данные с форм.
+3. Страница проекта должна грузить эти данные и показывать.
+"""
+
+
 #получаем данные из базы
 def loadSettings(projsTable,projId,dbname):
     condb = sqlite3.connect(dbname)
@@ -120,14 +130,18 @@ def getNewSubs(Objs,LastState,access_token):
     allUsersList = alluserids.split(",")
     
     newSubs = list(set(allUsersList) - set(LastState))
-    print(newSubs)
+    #print(newSubs)
     return newSubs, set(allUsersList)
     
     
     
     
+#должно работать, потестить    
+def getUnSubs(Objs,LastState,Token):
+    newSubs, allUsersList = getNewSubs(Objs,LastState,Token)
+    unSubs = list(set(LastState) - set(newSubs))
+    return unSubs, allUsersList
     
-def getUnSubs():
     
 
 def getNewFriends(Objs,LastState,access_token):
@@ -195,36 +209,52 @@ if objsType == 1:
     print('group')
     if whatLookAt == 1:
         print('all wall activity')
+        newUsersToAdd, newState = getAllWallActivity(Objs,LastState,Token)
+        
         
     elif whatLookAt == 11:
         print('likes wall activity')
+        newUsersToAdd, newState = getLikesWall(Objs,LastState,Token)
+        
         
     elif whatLookAt == 12:
-        print('likes wall activity')
+        print('comments wall activity')
+        newUsersToAdd, newState =getCommsWall(Objs,LastState,Token)
+        
         
     elif whatLookAt == 13:
-        print('likes wall activity')
+        print('likes reposts activity')
+        newUsersToAdd, newState = getRepostsWall(Objs,LastState,Token)
         
+    #done!
     elif whatLookAt == 2:
+           
         print('new subs')
         newUsersToAdd, newState = getNewSubs(Objs,LastState,Token)
         
     elif whatLookAt == 3:
-        print('unsubs')        
+        print('unsubs')
+        newUsersToAdd, newState = getUnsubs(Objs,LastState,Token)
+        
     
 elif objsType == 2:
     print('Следим за пользователями ')
     if whatLookAt == 1:
         print('all wall activity')
+        newUsersToAdd, newState = getAllWallActivity(Objs,LastState,Token)
+    
         
     elif whatLookAt == 11:
         print('likes wall activity')
+        newUsersToAdd, newState = newUsersToAdd, newState = getLikesWall(Objs,LastState,Token)
         
     elif whatLookAt == 12:
         print('likes wall activity')
+        newUsersToAdd, newState = newUsersToAdd, newState = getCommsWall(Objs,LastState,Token)
         
     elif whatLookAt == 13:
         print('likes wall activity')
+        newUsersToAdd, newState = newUsersToAdd, newState = getRepostsWall(Objs,LastState,Token)
         
 #готово!        
     elif whatLookAt == 4:
