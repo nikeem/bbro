@@ -137,9 +137,10 @@ def getNewSubs(Objs,LastState,access_token):
     
     
 #должно работать, потестить    
-def getUnSubs(Objs,LastState,Token):
+def getUnsubs(Objs,LastState,Token):
     newSubs, allUsersList = getNewSubs(Objs,LastState,Token)
-    unSubs = list(set(LastState) - set(newSubs))
+    unSubs = list(set(LastState) - set(allUsersList))
+    print('unSubs', unSubs)
     return unSubs, allUsersList
     
     
@@ -266,7 +267,7 @@ elif objsType == 3:
     if whatLookAt == 5:
         print('boardComments')
         
-        
+print("В базу добивм:", newUsersToAdd)        
 if len(newUsersToAdd) == 0:
     print("Ничего не добавили!")
 else:

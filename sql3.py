@@ -1,4 +1,4 @@
-
+#сброс проекта
 
 import sys
 import sqlite3

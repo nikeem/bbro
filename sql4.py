@@ -1,3 +1,4 @@
+#добавить в проект новые объекты
 import sys
 import sqlite3
 
