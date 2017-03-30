@@ -87,11 +87,6 @@ def retargetGroupUpdate(adAccId,adClientId,targetGroupId,Token,userIds):
     return resultt
     
 
-#def getAllWallActivity():
-    # def getWallLikes():
-    #def getWallReposts():    
-    # def getWallComments():
-        
     
 #def getWallLikes():
     
@@ -100,9 +95,14 @@ def retargetGroupUpdate(adAccId,adClientId,targetGroupId,Token,userIds):
     
     
 #def getWallComments():
+
+
+#def getAllWallActivity():
+    # def getWallLikes():
+    # def getWallReposts():    
+    # def getWallComments():
+        
     
-
-
 def getNewSubs(Objs,LastState,access_token):
     alluserids = []
     for eachid in Objs:
