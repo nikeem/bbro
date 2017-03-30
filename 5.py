@@ -267,8 +267,8 @@ elif objsType == 3:
     if whatLookAt == 5:
         print('boardComments')
         
-print("В базу добивм:", newUsersToAdd)        
-if len(newUsersToAdd) == 0:
+print("В базу добивм:", newUsersToAdd)     
+if len(newUsersToAdd) == 0 or newUsersToAdd[0] == "" :
     print("Ничего не добавили!")
 else:
     retargetGroupUpdate(adAccId,adClientId,targetGroupId,Token,newUsersToAdd)
