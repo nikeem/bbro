@@ -26,6 +26,7 @@ import json
 
 projsTable = 'Projs'
 dbname = 'test.db'
+active_projects = [11,12,13,14]
 
 
 
@@ -188,89 +189,92 @@ def getNewFriends(Objs,LastState,access_token):
         
         
 #основной цикл   
-
-# получаем настройки проекта. ЗДЕСЬ ХАРДКОД ID ПРОЕКТА. ПЕРЕДАВАТЬ ПЕРЕВЕННОЙ!
-(ProjId,ProjName,ProjOwner,objsType,whatLookAt,adAccId,adClientId,targetGroupId,Token,Objs,LastState) = loadSettings(projsTable,8,dbname)
-#print(ProjId,ProjName,ProjOwner,objsType,whatLookAt,adAccId,adClientId,targetGroupId,Token,Objs,LastState)
-
-#раскладываем строку объектов с список объектов
-Objs = Objs[1:-1].split(',')
-#print(Objs)
-
-#раскладываем строку найденных объектов в список объектов
-#print("LastState до разделения в список ", LastState)
-LastState = LastState[1:-1].split(',')
-#print(LastState)
-
-print("Загрузили настройки проекта\n")
-
-#в зависимости от типа объекта и типа отслеживания, вызываем функцию, а уже внутри нее вызывем функцию в зависимости от объекта отслеживания
-
-if objsType == 1:
-    print('group')
-    if whatLookAt == 1:
-        print('all wall activity')
-        newUsersToAdd, newState = getAllWallActivity(Objs,LastState,Token)
-        
-        
-    elif whatLookAt == 11:
-        print('likes wall activity')
-        newUsersToAdd, newState = getLikesWall(Objs,LastState,Token)
-        
-        
-    elif whatLookAt == 12:
-        print('comments wall activity')
-        newUsersToAdd, newState =getCommsWall(Objs,LastState,Token)
-        
-        
-    elif whatLookAt == 13:
-        print('likes reposts activity')
-        newUsersToAdd, newState = getRepostsWall(Objs,LastState,Token)
-        
-    #done!
-    elif whatLookAt == 2:
-           
-        print('new subs')
-        newUsersToAdd, newState = getNewSubs(Objs,LastState,Token)
-        
-    elif whatLookAt == 3:
-        print('unsubs')
-        newUsersToAdd, newState = getUnsubs(Objs,LastState,Token)
-        
+while True:
     
-elif objsType == 2:
-    print('Следим за пользователями ')
-    if whatLookAt == 1:
-        print('all wall activity')
-        newUsersToAdd, newState = getAllWallActivity(Objs,LastState,Token)
-    
-        
-    elif whatLookAt == 11:
-        print('likes wall activity')
-        newUsersToAdd, newState = newUsersToAdd, newState = getLikesWall(Objs,LastState,Token)
-        
-    elif whatLookAt == 12:
-        print('likes wall activity')
-        newUsersToAdd, newState = newUsersToAdd, newState = getCommsWall(Objs,LastState,Token)
-        
-    elif whatLookAt == 13:
-        print('likes wall activity')
-        newUsersToAdd, newState = newUsersToAdd, newState = getRepostsWall(Objs,LastState,Token)
-        
-#готово!        
-    elif whatLookAt == 4:
-        print('Получаем новых друзей пользователей ')
-        newUsersToAdd, newState = getNewFriends(Objs,LastState,Token)
-    
-elif objsType == 3:
-    print('topic')
-    if whatLookAt == 5:
-        print('boardComments')
-        
-print("В базу добивм:", newUsersToAdd)     
-if len(newUsersToAdd) == 0 or newUsersToAdd[0] == "" :
-    print("Ничего не добавили!")
-else:
-    retargetGroupUpdate(adAccId,adClientId,targetGroupId,Token,newUsersToAdd)
-    writeToDb(newState,dbname,ProjId)
+    for project_id in active_projects:
+   
+        # получаем настройки проекта. ЗДЕСЬ ХАРДКОД ID ПРОЕКТА. ПЕРЕДАВАТЬ ПЕРЕВЕННОЙ!
+        (ProjId,ProjName,ProjOwner,objsType,whatLookAt,adAccId,adClientId,targetGroupId,Token,Objs,LastState) = loadSettings(projsTable,project_id,dbname)
+        #print(ProjId,ProjName,ProjOwner,objsType,whatLookAt,adAccId,adClientId,targetGroupId,Token,Objs,LastState)
+
+        #раскладываем строку объектов с список объектов
+        Objs = Objs[1:-1].split(',')
+        #print(Objs)
+
+        #раскладываем строку найденных объектов в список объектов
+        #print("LastState до разделения в список ", LastState)
+        LastState = LastState[1:-1].split(',')
+        #print(LastState)
+
+        print("Загрузили настройки проекта\n")
+
+        #в зависимости от типа объекта и типа отслеживания, вызываем функцию, а уже внутри нее вызывем функцию в зависимости от объекта отслеживания
+
+        if objsType == 1:
+            print('group')
+            if whatLookAt == 1:
+                print('all wall activity')
+                newUsersToAdd, newState = getAllWallActivity(Objs,LastState,Token)
+
+
+            elif whatLookAt == 11:
+                print('likes wall activity')
+                newUsersToAdd, newState = getLikesWall(Objs,LastState,Token)
+
+
+            elif whatLookAt == 12:
+                print('comments wall activity')
+                newUsersToAdd, newState =getCommsWall(Objs,LastState,Token)
+
+
+            elif whatLookAt == 13:
+                print('likes reposts activity')
+                newUsersToAdd, newState = getRepostsWall(Objs,LastState,Token)
+
+            #done!
+            elif whatLookAt == 2:
+
+                print('new subs')
+                newUsersToAdd, newState = getNewSubs(Objs,LastState,Token)
+
+            elif whatLookAt == 3:
+                print('unsubs')
+                newUsersToAdd, newState = getUnsubs(Objs,LastState,Token)
+
+
+        elif objsType == 2:
+            print('Следим за пользователями ')
+            if whatLookAt == 1:
+                print('all wall activity')
+                newUsersToAdd, newState = getAllWallActivity(Objs,LastState,Token)
+
+
+            elif whatLookAt == 11:
+                print('likes wall activity')
+                newUsersToAdd, newState = newUsersToAdd, newState = getLikesWall(Objs,LastState,Token)
+
+            elif whatLookAt == 12:
+                print('likes wall activity')
+                newUsersToAdd, newState = newUsersToAdd, newState = getCommsWall(Objs,LastState,Token)
+
+            elif whatLookAt == 13:
+                print('likes wall activity')
+                newUsersToAdd, newState = newUsersToAdd, newState = getRepostsWall(Objs,LastState,Token)
+
+        #готово!        
+            elif whatLookAt == 4:
+                print('Получаем новых друзей пользователей ')
+                newUsersToAdd, newState = getNewFriends(Objs,LastState,Token)
+
+        elif objsType == 3:
+            print('topic')
+            if whatLookAt == 5:
+                print('boardComments')
+
+        print("В базу добивм:", newUsersToAdd)     
+        if len(newUsersToAdd) == 0 or newUsersToAdd[0] == "" :
+            print("Ничего не добавили!")
+        else:
+            retargetGroupUpdate(adAccId,adClientId,targetGroupId,Token,newUsersToAdd)
+            writeToDb(newState,dbname,ProjId)
     
