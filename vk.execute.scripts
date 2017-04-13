@@ -1,3 +1,74 @@
+=================================================================================================================================
+СКРИПТЫ ДЛЯ ПОЛУЧЕНИЯ ТЕХ, КТО ЛАЙКНУЛ ОБЪЕКТЫ
+
+Количество вызово API = количествогрупппользователей/25 + количествогрупппользователей*4 (т.е. для 100 групп это 4+400  = 404 вызова. 1 средний вызов = 0,4 сек. 161 секунда для того, чтобы спарсить всех лайкнувших полседние 100 постов в сообществе.)
+
+Сначала этим методом получаем 100 последнийх постов каждого из 25 пользователей/групп
+
+getpostsids
+
+var owneridslist = Args.ownerids.split(",");
+var ownertype = parseInt(Args.ownertype);
+var owneridslist2 = [];
+if (ownertype == 0){
+    var owneridslistlen = owneridslist.length;
+    while (owneridslistlen > 0){
+        var oneid = owneridslist.shift();
+        var oneidint = parseInt(oneid);
+        oneidint = 0 - oneidint;
+        owneridslist2.push(oneidint);
+        owneridslistlen = owneridslistlen - 1;
+    } 
+    
+} else {
+    owneridslist2 = [1,2,3];
+}
+
+var owneridslist2len = owneridslist2.length;
+var postsids = [];
+while (owneridslist2len > 0){
+    var ownerid = owneridslist2.shift();
+    postsids = postsids + API.wall.get({"owner_id": ownerid, "count" : "100"}).items@.id;
+    owneridslist2len = owneridslist2len - 1;
+}
+
+return postsids;
+
+
+
+
+
+getuserswholiked
+Затем этим методом получаем пользвателей, лайкнувших пост/фото/.... 25 объектов за раз, то есть 4 вызова 
+likes.getList
+
+
+var objtype = Args.type;
+var itemsidslist = Args.items.split(",");
+var ownerid = parseInt(Args.ownerid);
+
+var itemsidslistlen = itemsidslist.length;
+var userids = [];
+
+while (itemsidslistlen > 0){
+    var itemid = itemsidslist.shift();
+    userids = userids + API.likes.getList({"type": objtype, "owner_id": ownerid, "item_id": itemid, "count" : "1000"}).items;
+    itemsidslistlen = itemsidslistlen - 1;
+}
+
+return userids;
+
+
+
+
+
+
+
+
+
+
+
+
 var citylist = Args.citylist.split(",");
 var users = [];
 var users2 = [];
